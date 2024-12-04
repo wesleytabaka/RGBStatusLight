@@ -1,0 +1,4 @@
+enum Transition {
+  NOW,
+  FADE
+};

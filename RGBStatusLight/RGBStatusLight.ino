@@ -1,3 +1,6 @@
+#include "Effect.h"
+#include "Transition.h"
+
 /* Pinout */
 const int LED_R = 9;
 const int LED_G = 10;
@@ -11,6 +14,28 @@ int counter = 0;
 
 String serialOutput = "";
 
+/* Effect and transition variables */
+Effect effect = SOLID;
+int effectCounter = 0;
+int effectRate = 0;
+int effectPeriodLength = 32; // Nice base 2 number.  Should be able to describe the effect function in 32 steps with okay resolution.
+
+Transition transition = NOW;
+int transitionCounter = 0;
+int transitionDuration = 0;
+
+int effect_basecolor_r = 0;
+int effect_basecolor_g = 0;
+int effect_basecolor_b = 0;
+
+int transition_old_r = 0;
+int transition_old_g = 0;
+int transition_old_b = 0;
+int transition_new_r = 0;
+int transition_new_g = 0;
+int transition_new_b = 0;
+
+/* Startup */
 void setup() {
   pinMode(LED_R, OUTPUT);
   pinMode(LED_G, OUTPUT);
@@ -42,8 +67,33 @@ void applyColor(){
   analogWrite(LED_B, blue);
 }
 
-void loop() {
+void resetEffect(){
+  effectCounter = 0;  
+}
 
+void processEffect(Effect input_effect, int input_rate){
+  Serial.println("Invoked processEffect( " + String(input_effect) + ", " + String(input_rate));
+
+  effect = input_effect;
+  effectRate = input_rate;
+  
+  if(effect = BLINK){
+    int onoff = floor(effectCounter / (effectPeriodLength / 2));
+    setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
+    delay(floor(effectRate / effectPeriodLength));
+  }
+//  if(effect = PULSE){
+//    
+//  }
+//  if(effect = CYCLE){
+//    
+//  }
+  effectCounter = (effectCounter+1) % effectPeriodLength; // Increment effect counter, resetting so it never overflows.
+  applyColor(); // Set the pins.  
+}
+
+void loop() {
+  Serial.println("Invoked loop()");
   if(Serial.available()){    
     
     String input = Serial.readStringUntil('-');
@@ -60,10 +110,10 @@ void loop() {
       // TRANSITIONMODE: NOW: 0, FADE: 1
       // EFFECT: SOLID: 0, BLINK: 1, PULSE: 2, CYCLE: 3
       // example: 0,0,0,0,255,255,255
-      String transition = input.substring(0, field2);
-      String transitionDuration = input.substring(field2 + 1, field3);
-      String effect = input.substring(field3 + 1, field4);
-      String effectRate = input.substring(field4 + 1, field5);
+      transition = (Transition) input.substring(0, field2).toInt();
+      transitionDuration = input.substring(field2 + 1, field3).toInt();
+      effect = (Effect) input.substring(field3 + 1, field4).toInt();
+      effectRate = input.substring(field4 + 1, field5).toInt();
       String r = input.substring(field5 + 1, field6);
       String g = input.substring(field6 + 1, field7);
       String b = input.substring(field7 + 1);
@@ -82,12 +132,35 @@ void loop() {
       serialOutput += g;
       serialOutput += ",";
       serialOutput += b;
-  
+
+      resetEffect();
+      effect_basecolor_r = r.toInt();
+      effect_basecolor_g = g.toInt();
+      effect_basecolor_b = b.toInt();
+      
       setColor(r.toInt(), g.toInt(), b.toInt());
-      applyColor();
       Serial.println(serialOutput);
     }
   }
+
+  Serial.println("Before: Effect is " + String(effect) + ".  Effect rate is " + effectRate );
+
+  if(effect == SOLID){
+    applyColor(); // Set the pins. 
+    delay(5000);
+  }
+
+  if(effect == BLINK){
+    processEffect(SOLID, effectRate);
+  }
+
+//  if(effect == PULSE){
+//    processEffect(PULSE, effectRate);
+//  }
+//  if(effect == CYCLE){
+//    processEffect(CYCLE, effectRate);
+//  }
+   
+  Serial.println("After: Effect is " + String(effect) + ".  Effect rate is " + effectRate );
   
-  delay(3000);
 }
