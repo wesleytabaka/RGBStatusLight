@@ -77,15 +77,15 @@ void processEffect(Effect input_effect, int input_rate){
   effect = input_effect;
   effectRate = input_rate;
   
-  if(effect = BLINK){
+  if(effect == BLINK){
     int onoff = floor(effectCounter / (effectPeriodLength / 2));
     setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
     delay(floor(effectRate / effectPeriodLength));
   }
-//  if(effect = PULSE){
+//  if(effect == PULSE){
 //    
 //  }
-//  if(effect = CYCLE){
+//  if(effect == CYCLE){
 //    
 //  }
   effectCounter = (effectCounter+1) % effectPeriodLength; // Increment effect counter, resetting so it never overflows.
