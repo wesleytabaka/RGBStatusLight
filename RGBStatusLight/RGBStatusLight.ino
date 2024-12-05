@@ -71,20 +71,22 @@ void resetEffect(){
   effectCounter = 0;  
 }
 
-void processEffect(Effect input_effect, int input_rate){
-  Serial.println("Invoked processEffect( " + String(input_effect) + ", " + String(input_rate));
-
-  effect = input_effect;
-  effectRate = input_rate;
+void processEffect(){
+//  Serial.println("Invoked processEffect( " + String(input_effect) + ", " + String(input_rate));
+//
+//  effect = input_effect;
+//  effectRate = input_rate;
   
   if(effect == BLINK){
     int onoff = floor(effectCounter / (effectPeriodLength / 2));
     setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
     delay(floor(effectRate / effectPeriodLength));
   }
-//  if(effect == PULSE){
-//    
-//  }
+  if(effect == PULSE){
+    float proportion = (float)(effectPeriodLength - effectCounter - 1) / (float)effectPeriodLength;
+    setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
+    delay(floor(effectRate / effectPeriodLength));
+  }
 //  if(effect == CYCLE){
 //    
 //  }
@@ -151,12 +153,12 @@ void loop() {
   }
 
   if(effect == BLINK){
-    processEffect(SOLID, effectRate);
+    processEffect();
   }
 
-//  if(effect == PULSE){
-//    processEffect(PULSE, effectRate);
-//  }
+  if(effect == PULSE){
+    processEffect();
+  }
 //  if(effect == CYCLE){
 //    processEffect(CYCLE, effectRate);
 //  }
