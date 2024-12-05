@@ -87,9 +87,37 @@ void processEffect(){
     setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
     delay(floor(effectRate / effectPeriodLength));
   }
-//  if(effect == CYCLE){
-//    
-//  }
+  if(effect == CYCLE){
+    int thisStep = (effectCounter % 11);
+    float r_component;
+    float g_component;
+    float b_component;
+
+    float goingUp = (float)(thisStep) / (float)11;
+    float goingDown = (float)(11 - thisStep) / (float)11;
+    
+    if(effectCounter >= 0 && effectCounter < 11){
+      r_component = (float)255 * goingDown; // Going down
+      g_component = (float)255 * goingUp; // Going up
+      b_component = 0;
+    }
+
+    if(effectCounter >= 11 && effectCounter < 22){
+      r_component = 0;
+      g_component = (float)255 * goingDown; // Going down
+      b_component = (float)255 * goingUp; // Going up
+    }
+
+    if(effectCounter >= 22 && effectCounter < 32){
+      r_component = (float)255 * goingUp; // Going up
+      g_component = 0;
+      b_component = (float)255 * goingDown; // Going down
+    }
+    
+    setColor(floor(r_component), floor(g_component), floor(b_component));
+    delay(floor(effectRate / effectPeriodLength));
+  }
+  
   effectCounter = (effectCounter+1) % effectPeriodLength; // Increment effect counter, resetting so it never overflows.
   applyColor(); // Set the pins.  
 }
@@ -159,9 +187,9 @@ void loop() {
   if(effect == PULSE){
     processEffect();
   }
-//  if(effect == CYCLE){
-//    processEffect(CYCLE, effectRate);
-//  }
+  if(effect == CYCLE){
+    processEffect();
+  }
    
   Serial.println("After: Effect is " + String(effect) + ".  Effect rate is " + effectRate );
   
