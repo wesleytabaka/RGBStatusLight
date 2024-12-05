@@ -82,6 +82,11 @@ void processEffect(){
     setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
     delay(floor(effectRate / effectPeriodLength));
   }
+  if(effect == FLASH){
+    float proportion = (abs(((float)effectPeriodLength / (float)2) - (float)effectCounter) * (float)2) / (float)effectPeriodLength;
+    setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
+    delay(floor(effectRate / effectPeriodLength));
+  }
   if(effect == PULSE){
     float proportion = (float)(effectPeriodLength - effectCounter - 1) / (float)effectPeriodLength;
     setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
@@ -182,6 +187,10 @@ void loop() {
 
   if(effect == BLINK){
     processEffect();
+  }
+
+  if(effect == FLASH){
+     processEffect();
   }
 
   if(effect == PULSE){
