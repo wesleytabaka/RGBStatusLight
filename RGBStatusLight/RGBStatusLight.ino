@@ -185,18 +185,7 @@ void loop() {
     delay(5000);
   }
 
-  if(effect == BLINK){
-    processEffect();
-  }
-
-  if(effect == FLASH){
-     processEffect();
-  }
-
-  if(effect == PULSE){
-    processEffect();
-  }
-  if(effect == CYCLE){
+  else {
     processEffect();
   }
    
