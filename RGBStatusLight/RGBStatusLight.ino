@@ -23,6 +23,7 @@ int effectPeriodLength = 32; // Nice base 2 number.  Should be able to describe 
 Transition transition = NOW;
 int transitionCounter = 0;
 int transitionDuration = 0;
+int transitionPeriodLength = 32; // Nice base 2 number.  Should be able to describe the transition function in 32 steps with okay resolution.
 
 int effect_basecolor_r = 0;
 int effect_basecolor_g = 0;
@@ -71,12 +72,15 @@ void resetEffect(){
   effectCounter = 0;  
 }
 
+void resetTransition(){
+  transitionCounter = 0;  
+}
+
 void processEffect(){
 //  Serial.println("Invoked processEffect( " + String(input_effect) + ", " + String(input_rate));
-//
-//  effect = input_effect;
-//  effectRate = input_rate;
-  
+  if(effect == SOLID){
+    delay(effectPeriodLength);
+  }
   if(effect == BLINK){
     int onoff = floor(effectCounter / (effectPeriodLength / 2));
     setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
@@ -127,6 +131,43 @@ void processEffect(){
   applyColor(); // Set the pins.  
 }
 
+void processTransition(){
+  Serial.println("Invoked processTransition");
+  if(transitionCounter < transitionPeriodLength){
+    // Transition to the correct first color if the effect is CYCLE.
+    if(effect == CYCLE){
+      transition_new_r = 255;
+      transition_new_g = 0;
+      transition_new_b = 0;
+    }
+    if(transition == FADE){
+      // Calculate difference between old and new and prorate the color components along the transitionPeriodLength.
+      float r_diff = (float)transition_new_r - (float)transition_old_r;
+      float g_diff = (float)transition_new_g - (float)transition_old_g;
+      float b_diff = (float)transition_new_b - (float)transition_old_b;
+
+      Serial.println("r_diff: " + String(r_diff) + ", g_diff: " + String(g_diff) + ", b_diff: " + String(b_diff));
+  
+      int new_r = floor((float)transition_old_r + (r_diff * ((float)transitionCounter / (float)transitionPeriodLength)));
+      int new_g = floor((float)transition_old_g + (g_diff * ((float)transitionCounter / (float)transitionPeriodLength)));
+      int new_b = floor((float)transition_old_b + (b_diff * ((float)transitionCounter / (float)transitionPeriodLength)));
+
+      Serial.println("new_r: " + String(new_r) + ", new_g: " + String(new_g) + ", new_b: " + String(new_b));
+  
+      setColor(new_r, new_g, new_b); // Again, this could interfere with effect.
+      transitionCounter = (transitionCounter + 1); // Increment transition counter.
+      applyColor();
+      delay(floor(transitionDuration / transitionPeriodLength));
+    }
+    else {
+      setColor(transition_new_r, transition_new_g, transition_new_b);
+      transitionCounter = transitionPeriodLength; // Mark the "NOW" transition as done.
+      applyColor();
+      // No delay.
+    }
+  }
+}
+
 void loop() {
   Serial.println("Invoked loop()");
   if(Serial.available()){    
@@ -172,19 +213,25 @@ void loop() {
       effect_basecolor_r = r.toInt();
       effect_basecolor_g = g.toInt();
       effect_basecolor_b = b.toInt();
+
+      resetTransition();
+      transition_old_r = abs(red-255);
+      transition_old_g = abs(green-255);
+      transition_old_b = abs(blue-255);
+      transition_new_r = r.toInt();
+      transition_new_g = g.toInt();
+      transition_new_b = b.toInt();
       
-      setColor(r.toInt(), g.toInt(), b.toInt());
       Serial.println(serialOutput);
     }
   }
 
   Serial.println("Before: Effect is " + String(effect) + ".  Effect rate is " + effectRate );
 
-  if(effect == SOLID){
-    applyColor(); // Set the pins. 
-    delay(5000);
+  // Continue processing the transition until it is done.
+  if(transitionCounter < transitionPeriodLength){
+    processTransition();
   }
-
   else {
     processEffect();
   }
