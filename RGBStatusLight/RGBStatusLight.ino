@@ -137,6 +137,12 @@ void processEffect(){
         b_component = (float)255 * goingDown; // Going down
       }
 
+      if(effectCounter >= (3 * cycleSectionPeriod)){
+        r_component = 255; // Going up
+        g_component = 0;
+        b_component = 0; // Going down
+      }
+
       setColor(floor(r_component), floor(g_component), floor(b_component));
       delay(floor(refreshRate));
       break;
