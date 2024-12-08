@@ -97,8 +97,7 @@ void processEffect(){
     case BLINK:
       onoff = floor(effectCounter / (effectPeriodLength / 2));
       setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
-      effectCounter += (effectPeriodLength / 2) - 1; // Jump ahead to the next section of the effect.
-      delay(floor(refreshRate * ((float)effectPeriodLength / (float)2))); // Delay for half of the effect.  Reduce the overall number of loop()s.
+      delay(floor(refreshRate)); // Delay for half of the effect.  Reduce the overall number of loop()s.
       break;
     case FLASH:
       proportion = (abs(((float)effectPeriodLength / (float)2) - (float)effectCounter) * (float)2) / (float)effectPeriodLength;
