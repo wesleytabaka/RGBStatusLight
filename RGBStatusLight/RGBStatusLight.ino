@@ -133,7 +133,7 @@ void processEffect(){
 
 void processTransition(){
   Serial.println("Invoked processTransition");
-  if(transitionCounter < transitionPeriodLength){
+  if(transitionCounter <= transitionPeriodLength){
     // Transition to the correct first color if the effect is CYCLE.
     if(effect == CYCLE){
       transition_new_r = 255;
@@ -229,7 +229,7 @@ void loop() {
   Serial.println("Before: Effect is " + String(effect) + ".  Effect rate is " + effectRate );
 
   // Continue processing the transition until it is done.
-  if(transitionCounter < transitionPeriodLength){
+  if(transitionCounter <= transitionPeriodLength){
     processTransition();
   }
   else {
