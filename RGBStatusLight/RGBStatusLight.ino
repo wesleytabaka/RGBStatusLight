@@ -182,7 +182,7 @@ void processTransition(){
     }
     else {
       setColor(transition_new_r, transition_new_g, transition_new_b);
-      transitionCounter = transitionPeriodLength; // Mark the "NOW" transition as done.
+      transitionCounter = transitionPeriodLength + 1; // Mark the "NOW" transition as done.  Make sure we're over the transitionPeriodLength.
       applyColor();
       // No delay.
     }
