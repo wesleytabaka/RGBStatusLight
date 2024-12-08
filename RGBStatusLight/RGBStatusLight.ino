@@ -92,12 +92,13 @@ void processEffect(){
 
   switch(effect){
     case SOLID:
-      delay(floor(refreshRate));
+      delay(10000); // Don't waste time refreshing for SOLID effect.
       break;
     case BLINK:
       onoff = floor(effectCounter / (effectPeriodLength / 2));
       setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
-      delay(floor(refreshRate));
+      effectCounter += (effectPeriodLength / 2) - 1; // Jump ahead to the next section of the effect.
+      delay(floor(refreshRate * ((float)effectPeriodLength / (float)2))); // Delay for half of the effect.  Reduce the overall number of loop()s.
       break;
     case FLASH:
       proportion = (abs(((float)effectPeriodLength / (float)2) - (float)effectCounter) * (float)2) / (float)effectPeriodLength;
@@ -135,7 +136,7 @@ void processEffect(){
         g_component = 0;
         b_component = (float)255 * goingDown; // Going down
       }
-      
+
       setColor(floor(r_component), floor(g_component), floor(b_component));
       delay(floor(refreshRate));
       break;
