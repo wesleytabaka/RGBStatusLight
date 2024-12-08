@@ -15,15 +15,17 @@ int counter = 0;
 String serialOutput = "";
 
 /* Effect and transition variables */
+float refreshRate = 33.00; // milliseconds
+
 Effect effect = SOLID;
 int effectCounter = 0;
 int effectRate = 0;
-int effectPeriodLength = 32; // Nice base 2 number.  Should be able to describe the effect function in 32 steps with okay resolution.
+int effectPeriodLength;
 
 Transition transition = NOW;
 int transitionCounter = 0;
 int transitionDuration = 0;
-int transitionPeriodLength = 32; // Nice base 2 number.  Should be able to describe the transition function in 32 steps with okay resolution.
+int transitionPeriodLength;
 
 int effect_basecolor_r = 0;
 int effect_basecolor_g = 0;
@@ -86,55 +88,56 @@ void processEffect(){
   float b_component = 0.00;
   float goingUp = 0.00;
   float goingDown = 0.00;
+  int cycleSectionPeriod = floor((float)effectPeriodLength / (float)3);
 
   switch(effect){
     case SOLID:
-      delay(effectPeriodLength);
+      delay(floor(refreshRate));
       break;
     case BLINK:
       onoff = floor(effectCounter / (effectPeriodLength / 2));
       setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
-      delay(floor(effectRate / effectPeriodLength));
+      delay(floor(refreshRate));
       break;
     case FLASH:
       proportion = (abs(((float)effectPeriodLength / (float)2) - (float)effectCounter) * (float)2) / (float)effectPeriodLength;
       setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
-      delay(floor(effectRate / effectPeriodLength));
+      delay(floor(refreshRate));
       break;
     case PULSE:
       proportion = (float)(effectPeriodLength - effectCounter - 1) / (float)effectPeriodLength;
       setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
-      delay(floor(effectRate / effectPeriodLength));
+      delay(floor(refreshRate));
       break;
     case CYCLE:
-      thisStep = (effectCounter % 11);
+      thisStep = (effectCounter % cycleSectionPeriod);
       r_component;
       g_component;
       b_component;
   
-      goingUp = (float)(thisStep) / (float)11;
-      goingDown = (float)(11 - thisStep) / (float)11;
+      goingUp = (float)(thisStep) / (float)cycleSectionPeriod;
+      goingDown = (float)(cycleSectionPeriod - thisStep) / (float)cycleSectionPeriod;
       
-      if(effectCounter >= 0 && effectCounter < 11){
+      if(effectCounter >= 0 && effectCounter < (1 * cycleSectionPeriod)){
         r_component = (float)255 * goingDown; // Going down
         g_component = (float)255 * goingUp; // Going up
         b_component = 0;
       }
   
-      if(effectCounter >= 11 && effectCounter < 22){
+      if(effectCounter >= (1 * cycleSectionPeriod) && effectCounter < (2 * cycleSectionPeriod)){
         r_component = 0;
         g_component = (float)255 * goingDown; // Going down
         b_component = (float)255 * goingUp; // Going up
       }
   
-      if(effectCounter >= 22 && effectCounter < 32){
+      if(effectCounter >= (2 * cycleSectionPeriod) && effectCounter < (3 * cycleSectionPeriod)){
         r_component = (float)255 * goingUp; // Going up
         g_component = 0;
         b_component = (float)255 * goingDown; // Going down
       }
       
       setColor(floor(r_component), floor(g_component), floor(b_component));
-      delay(floor(effectRate / effectPeriodLength));
+      delay(floor(refreshRate));
       break;
   }
   
@@ -168,7 +171,7 @@ void processTransition(){
       setColor(new_r, new_g, new_b); // Again, this could interfere with effect.
       transitionCounter = (transitionCounter + 1); // Increment transition counter.
       applyColor();
-      delay(floor(transitionDuration / transitionPeriodLength));
+      delay(floor(refreshRate));
     }
     else {
       setColor(transition_new_r, transition_new_g, transition_new_b);
@@ -224,6 +227,7 @@ void loop() {
       effect_basecolor_r = r.toInt();
       effect_basecolor_g = g.toInt();
       effect_basecolor_b = b.toInt();
+      effectPeriodLength = floor((float)effectRate / refreshRate);
 
       resetTransition();
       transition_old_r = abs(red-255);
@@ -232,6 +236,7 @@ void loop() {
       transition_new_r = r.toInt();
       transition_new_g = g.toInt();
       transition_new_b = b.toInt();
+      transitionPeriodLength = floor((float)transitionDuration / refreshRate);
       
       Serial.println(serialOutput);
     }
