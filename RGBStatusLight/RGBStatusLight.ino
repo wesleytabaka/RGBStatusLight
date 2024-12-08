@@ -78,53 +78,64 @@ void resetTransition(){
 
 void processEffect(){
 //  Serial.println("Invoked processEffect( " + String(input_effect) + ", " + String(input_rate));
-  if(effect == SOLID){
-    delay(effectPeriodLength);
-  }
-  if(effect == BLINK){
-    int onoff = floor(effectCounter / (effectPeriodLength / 2));
-    setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
-    delay(floor(effectRate / effectPeriodLength));
-  }
-  if(effect == FLASH){
-    float proportion = (abs(((float)effectPeriodLength / (float)2) - (float)effectCounter) * (float)2) / (float)effectPeriodLength;
-    setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
-    delay(floor(effectRate / effectPeriodLength));
-  }
-  if(effect == PULSE){
-    float proportion = (float)(effectPeriodLength - effectCounter - 1) / (float)effectPeriodLength;
-    setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
-    delay(floor(effectRate / effectPeriodLength));
-  }
-  if(effect == CYCLE){
-    int thisStep = (effectCounter % 11);
-    float r_component;
-    float g_component;
-    float b_component;
+  int onoff = 0;
+  float proportion = 0.00;
+  int thisStep = 0;
+  float r_component = 0.00;
+  float g_component = 0.00;
+  float b_component = 0.00;
+  float goingUp = 0.00;
+  float goingDown = 0.00;
 
-    float goingUp = (float)(thisStep) / (float)11;
-    float goingDown = (float)(11 - thisStep) / (float)11;
-    
-    if(effectCounter >= 0 && effectCounter < 11){
-      r_component = (float)255 * goingDown; // Going down
-      g_component = (float)255 * goingUp; // Going up
-      b_component = 0;
-    }
-
-    if(effectCounter >= 11 && effectCounter < 22){
-      r_component = 0;
-      g_component = (float)255 * goingDown; // Going down
-      b_component = (float)255 * goingUp; // Going up
-    }
-
-    if(effectCounter >= 22 && effectCounter < 32){
-      r_component = (float)255 * goingUp; // Going up
-      g_component = 0;
-      b_component = (float)255 * goingDown; // Going down
-    }
-    
-    setColor(floor(r_component), floor(g_component), floor(b_component));
-    delay(floor(effectRate / effectPeriodLength));
+  switch(effect){
+    case SOLID:
+      delay(effectPeriodLength);
+      break;
+    case BLINK:
+      onoff = floor(effectCounter / (effectPeriodLength / 2));
+      setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
+      delay(floor(effectRate / effectPeriodLength));
+      break;
+    case FLASH:
+      proportion = (abs(((float)effectPeriodLength / (float)2) - (float)effectCounter) * (float)2) / (float)effectPeriodLength;
+      setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
+      delay(floor(effectRate / effectPeriodLength));
+      break;
+    case PULSE:
+      proportion = (float)(effectPeriodLength - effectCounter - 1) / (float)effectPeriodLength;
+      setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
+      delay(floor(effectRate / effectPeriodLength));
+      break;
+    case CYCLE:
+      thisStep = (effectCounter % 11);
+      r_component;
+      g_component;
+      b_component;
+  
+      goingUp = (float)(thisStep) / (float)11;
+      goingDown = (float)(11 - thisStep) / (float)11;
+      
+      if(effectCounter >= 0 && effectCounter < 11){
+        r_component = (float)255 * goingDown; // Going down
+        g_component = (float)255 * goingUp; // Going up
+        b_component = 0;
+      }
+  
+      if(effectCounter >= 11 && effectCounter < 22){
+        r_component = 0;
+        g_component = (float)255 * goingDown; // Going down
+        b_component = (float)255 * goingUp; // Going up
+      }
+  
+      if(effectCounter >= 22 && effectCounter < 32){
+        r_component = (float)255 * goingUp; // Going up
+        g_component = 0;
+        b_component = (float)255 * goingDown; // Going down
+      }
+      
+      setColor(floor(r_component), floor(g_component), floor(b_component));
+      delay(floor(effectRate / effectPeriodLength));
+      break;
   }
   
   effectCounter = (effectCounter+1) % effectPeriodLength; // Increment effect counter, resetting so it never overflows.
