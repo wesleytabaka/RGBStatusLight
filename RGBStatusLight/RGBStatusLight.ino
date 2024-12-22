@@ -2,7 +2,7 @@
 #include "Transition.h"
 
 /* Pinout */
-const int LED_R = 9;
+const int LED_R = 6;
 const int LED_G = 10;
 const int LED_B = 11;
 
