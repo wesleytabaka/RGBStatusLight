@@ -30,6 +30,9 @@ int transitionPeriodLength;
 int effect_basecolor_r = 0;
 int effect_basecolor_g = 0;
 int effect_basecolor_b = 0;
+int effect_basecolor_r2 = 0;
+int effect_basecolor_g2 = 0;
+int effect_basecolor_b2 = 0;
 
 int transition_old_r = 0;
 int transition_old_g = 0;
@@ -96,17 +99,22 @@ void processEffect(){
       break;
     case BLINK:
       onoff = floor(effectCounter / (effectPeriodLength / 2));
-      setColor(effect_basecolor_r * onoff, effect_basecolor_g * onoff, effect_basecolor_b * onoff);
+      if(onoff == 0){
+        setColor(effect_basecolor_r, effect_basecolor_g, effect_basecolor_b);
+      }
+      else {
+        setColor(effect_basecolor_r2, effect_basecolor_g2, effect_basecolor_b2);
+      }
       delay(floor(refreshRate)); // Delay for half of the effect.  Reduce the overall number of loop()s.
       break;
     case FLASH:
       proportion = (abs(((float)effectPeriodLength / (float)2) - (float)effectCounter) * (float)2) / (float)effectPeriodLength;
-      setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
+      setColor(floor(((float)effect_basecolor_r * proportion) + ((float)effect_basecolor_r2 * (1 - proportion))), floor(((float)effect_basecolor_g * proportion) + ((float)effect_basecolor_g2 * (1 - proportion))), floor(((float)effect_basecolor_b * proportion) + ((float)effect_basecolor_b2 * (1 - proportion))));
       delay(floor(refreshRate));
       break;
     case PULSE:
       proportion = (float)(effectPeriodLength - effectCounter - 1) / (float)effectPeriodLength;
-      setColor(floor((float)effect_basecolor_r * proportion), floor((float)effect_basecolor_g * proportion), floor((float)effect_basecolor_b * proportion));
+      setColor(floor(((float)effect_basecolor_r * proportion) + (effect_basecolor_r2 * (1 - proportion))), floor(((float)effect_basecolor_g * proportion) + ((float)effect_basecolor_g2 * (1 - proportion))), floor(((float)effect_basecolor_b * proportion) + ((float)effect_basecolor_b2 * (1 - proportion))));
       delay(floor(refreshRate));
       break;
     case CYCLE:
@@ -201,6 +209,9 @@ void loop() {
       int field5 = input.indexOf(",", field4 + 1);
       int field6 = input.indexOf(",", field5 + 1);
       int field7 = input.indexOf(",", field6 + 1);
+      int field8 = input.indexOf(",", field7 + 1);
+      int field9 = input.indexOf(",", field8 + 1);
+      int field10 = input.indexOf(",", field9 + 1);
 
       // Color changing command:
       // TRANSITIONMODE: NOW: 0, FADE: 1
@@ -212,7 +223,10 @@ void loop() {
       effectRate = input.substring(field4 + 1, field5).toInt();
       String r = input.substring(field5 + 1, field6);
       String g = input.substring(field6 + 1, field7);
-      String b = input.substring(field7 + 1);
+      String b = input.substring(field7 + 1, field8);
+      String r2 = input.substring(field8 + 1, field9);
+      String g2 = input.substring(field9 + 1, field10);
+      String b2 = input.substring(field10 + 1);
 
       serialOutput = "OK:";
       serialOutput += transition;
@@ -228,11 +242,20 @@ void loop() {
       serialOutput += g;
       serialOutput += ",";
       serialOutput += b;
+      serialOutput += ",";
+      serialOutput += r2;
+      serialOutput += ",";
+      serialOutput += g2;
+      serialOutput += ",";
+      serialOutput += b2;
 
       resetEffect();
       effect_basecolor_r = r.toInt();
       effect_basecolor_g = g.toInt();
       effect_basecolor_b = b.toInt();
+      effect_basecolor_r2 = r2.toInt();
+      effect_basecolor_g2 = g2.toInt();
+      effect_basecolor_b2 = b2.toInt();
       effectPeriodLength = floor((float)effectRate / refreshRate);
 
       resetTransition();
