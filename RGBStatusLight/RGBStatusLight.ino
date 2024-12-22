@@ -160,7 +160,7 @@ void processEffect(){
 }
 
 void processTransition(){
-  Serial.println("Invoked processTransition");
+//  Serial.println("Invoked processTransition");
   if(transitionCounter <= transitionPeriodLength){
     // Transition to the correct first color if the effect is CYCLE.
     if(effect == CYCLE){
@@ -174,13 +174,13 @@ void processTransition(){
       float g_diff = (float)transition_new_g - (float)transition_old_g;
       float b_diff = (float)transition_new_b - (float)transition_old_b;
 
-      Serial.println("r_diff: " + String(r_diff) + ", g_diff: " + String(g_diff) + ", b_diff: " + String(b_diff));
+//      Serial.println("r_diff: " + String(r_diff) + ", g_diff: " + String(g_diff) + ", b_diff: " + String(b_diff));
   
       int new_r = floor((float)transition_old_r + (r_diff * ((float)transitionCounter / (float)transitionPeriodLength)));
       int new_g = floor((float)transition_old_g + (g_diff * ((float)transitionCounter / (float)transitionPeriodLength)));
       int new_b = floor((float)transition_old_b + (b_diff * ((float)transitionCounter / (float)transitionPeriodLength)));
 
-      Serial.println("new_r: " + String(new_r) + ", new_g: " + String(new_g) + ", new_b: " + String(new_b));
+//      Serial.println("new_r: " + String(new_r) + ", new_g: " + String(new_g) + ", new_b: " + String(new_b));
   
       setColor(new_r, new_g, new_b); // Again, this could interfere with effect.
       transitionCounter = (transitionCounter + 1); // Increment transition counter.
@@ -197,7 +197,7 @@ void processTransition(){
 }
 
 void loop() {
-  Serial.println("Invoked loop()");
+//  Serial.println("Invoked loop()");
   if(Serial.available()){    
     
     String input = Serial.readStringUntil('-');
@@ -271,7 +271,7 @@ void loop() {
     }
   }
 
-  Serial.println("Before: Effect is " + String(effect) + ".  Effect rate is " + effectRate );
+//  Serial.println("Before: Effect is " + String(effect) + ".  Effect rate is " + effectRate );
 
   // Continue processing the transition until it is done.
   if(transitionCounter <= transitionPeriodLength){
@@ -281,6 +281,6 @@ void loop() {
     processEffect();
   }
    
-  Serial.println("After: Effect is " + String(effect) + ".  Effect rate is " + effectRate );
+//  Serial.println("After: Effect is " + String(effect) + ".  Effect rate is " + effectRate );
   
 }
