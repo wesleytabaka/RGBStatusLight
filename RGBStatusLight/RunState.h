@@ -1,0 +1,4 @@
+enum RunState {
+  RUN,
+  SLEEP
+};
